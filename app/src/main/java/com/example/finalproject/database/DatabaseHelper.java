@@ -6,7 +6,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     // Database Info
-    private static final String DATABASE_NAME = "priolist_db";
+    private static final String DATABASE_NAME = "priolistdb";
     private static final int DATABASE_VERSION = 1;
 
     // Table Name
