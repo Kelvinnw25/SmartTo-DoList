@@ -28,16 +28,16 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        // Query SQL untuk membuat tabel
+        //SQL Query for create table
         String CREATE_TASKS_TABLE = "CREATE TABLE " + TABLE_TASKS +
                 "(" +
-                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," + // Primary Key
+                COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
                 COLUMN_TITLE + " TEXT NOT NULL," +
                 COLUMN_DESCRIPTION + " TEXT," +
-                COLUMN_DEADLINE + " INTEGER," + // Disimpan sebagai UNIX Timestamp (long/INTEGER)
+                COLUMN_DEADLINE + " INTEGER," +
                 COLUMN_IMPORTANCE + " INTEGER," +
-                COLUMN_IS_COMPLETED + " INTEGER," + // 0 = false, 1 = true
-                COLUMN_PRIORITY_SCORE + " REAL" + // Angka desimal (REAL)
+                COLUMN_IS_COMPLETED + " INTEGER," +
+                COLUMN_PRIORITY_SCORE + " REAL" + //decimal number
                 ")";
 
         db.execSQL(CREATE_TASKS_TABLE);
