@@ -3,6 +3,10 @@ package com.example.finalproject.database;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import com.example.finalproject.model.Task;
+import java.util.ArrayList;
+import java.util.List;
+import android.database.Cursor;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
     // Database Info
@@ -50,5 +54,55 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
             onCreate(db);
         }
+    }
+
+    public List<Task> getTasks() {
+        List<Task> taskList = new ArrayList<>();
+
+        //descending order
+        String SELECT_QUERY = "SELECT * FROM " + TABLE_TASKS +
+                " ORDER BY " + COLUMN_PRIORITY_SCORE + " DESC";
+
+        //readable
+        SQLiteDatabase db = this.getReadableDatabase();
+
+        //store query
+        Cursor cursor = db.rawQuery(SELECT_QUERY, null);
+
+        //loop the row and add to list
+        if (cursor.moveToFirst()) {
+            do {
+                //take the value in every column
+                int id = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_ID));
+                String title = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_TITLE));
+                String description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION));
+                long deadlineTimestamp = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_DEADLINE));
+                int importanceLevel = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IMPORTANCE));
+
+                //convert int to boolean
+                boolean isCompleted = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_COMPLETED)) == 1;
+
+                double priorityScore = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PRIORITY_SCORE));
+
+                //static factory for create object Task
+                Task task = Task.fromDatabase(
+                        id,
+                        title,
+                        description,
+                        deadlineTimestamp,
+                        importanceLevel,
+                        isCompleted,
+                        priorityScore
+                );
+
+                taskList.add(task);
+
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return taskList;
     }
 }
