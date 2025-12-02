@@ -1,3 +1,11 @@
 <resources>
-    <string name="app_name">FInalProject</string>
+    <string name="app_name">FinalProject</string>
+    <string-array name="importance_levels">
+        <item>1 - Sangat Rendah</item>
+        <item>2 - Rendah</item>
+        <item>3 - Sedang</item>
+        <item>4 - Tinggi</item>
+        <item>5 - Mendesak</item>
+    </string-array>
+
 </resources>

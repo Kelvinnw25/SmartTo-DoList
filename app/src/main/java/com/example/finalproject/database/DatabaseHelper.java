@@ -1,5 +1,6 @@
 package com.example.finalproject.database;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
@@ -47,6 +48,29 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL(CREATE_TASKS_TABLE);
     }
 
+    public void updateTaskScore(int id, double newScore) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_PRIORITY_SCORE, newScore); // Kita hanya update kolom skor
+
+        //update task score which has same ID with parameter ID
+        db.update(TABLE_TASKS, values, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+
+        db.close();
+    }
+
+    //method for update task status
+    public void updateTaskStatus(int id, boolean isCompleted) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_IS_COMPLETED, isCompleted ? 1 : 0);
+
+        db.update(TABLE_TASKS, values, COLUMN_ID + " = ?", new String[]{String.valueOf(id)});
+        db.close();
+    }
+
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion != newVersion) {
@@ -54,6 +78,23 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
             onCreate(db);
         }
+    }
+
+    //method for add new task
+    public long addTask(Task task) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+
+        values.put(COLUMN_TITLE, task.getTitle());
+        values.put(COLUMN_DESCRIPTION, task.getDescription());
+        values.put(COLUMN_DEADLINE, task.getDeadlineTimestamp());
+        values.put(COLUMN_IMPORTANCE, task.getImportanceLevel());
+        values.put(COLUMN_IS_COMPLETED, task.isCompleted() ? 1 : 0);
+        values.put(COLUMN_PRIORITY_SCORE, task.getPriorityScore());
+
+        long id = db.insert(TABLE_TASKS, null, values);
+        db.close();
+        return id;
     }
 
     public List<Task> getTasks() {
