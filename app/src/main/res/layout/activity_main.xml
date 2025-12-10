@@ -17,7 +17,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:paddingTop="8dp"
         android:clipToPadding="false"
-        tools:listitem="@layout/item_task" />
+        tools:listitem="@layout/item_task"
+        android:layout_marginTop="45dp"/>
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab_add_task"

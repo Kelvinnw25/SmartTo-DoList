@@ -146,4 +146,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
 
         return taskList;
     }
+
+    // Method untuk menghapus SEMUA tugas yang sudah dicentang (selesai)
+    public void deleteCompletedTasks() {
+        SQLiteDatabase db = this.getWritableDatabase();
+        // Hapus baris di mana kolom is_completed bernilai 1 (true)
+        db.delete(TABLE_TASKS, COLUMN_IS_COMPLETED + " = ?", new String[]{"1"});
+        db.close();
+    }
 }
