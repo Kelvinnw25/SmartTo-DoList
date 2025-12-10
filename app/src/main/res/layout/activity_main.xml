@@ -43,4 +43,19 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"/>
 
+    <ImageButton
+        android:id="@+id/btn_more_menu"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginBottom="24dp"
+        android:background="@drawable/btn_primary_rounded"
+        android:backgroundTint="#FFFFFF"
+        android:src="@drawable/ic_more_vert"
+        android:contentDescription="Opsi Lainnya"
+        android:elevation="6dp"
+        app:tint="@color/colorPrimary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

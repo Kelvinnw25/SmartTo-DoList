@@ -7,7 +7,10 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.ImageButton;
+import android.widget.PopupMenu;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -26,6 +29,7 @@ public class MainActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private TaskAdapter taskAdapter;
     private TextView tvEmptyState;
+    private ImageButton btnMoreMenu;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,17 +45,56 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
+        //connect variabel with button in layout
+        btnMoreMenu = findViewById(R.id.btn_more_menu);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
+
         //onclicklistener
         fabAddTask.setOnClickListener(v -> {
             Intent intent = new Intent(MainActivity.this, TaskDetailActivity.class);
             startActivity(intent);
         });
+
+        //listener for 3 dots button
+        btnMoreMenu.setOnClickListener(v -> showPopupMenu(v));
     }
 
     @Override
     protected void onResume() {
         super.onResume();
         loadTasks();
+    }
+
+    //method for show popup menu
+    private void showPopupMenu(View view) {
+        PopupMenu popup = new PopupMenu(this, view);
+
+        //add menu "Delete Completed Tasks"
+        popup.getMenu().add(0, 1, 0, "Delete Completed Tasks");
+
+        //listener for popup
+        popup.setOnMenuItemClickListener(item -> {
+            if (item.getItemId() == 1) {
+                deleteCompletedTasks();
+                return true;
+            }
+            return false;
+        });
+
+        popup.show();
+    }
+
+    //method for execute delete and refresh
+    private void deleteCompletedTasks() {
+        //delete
+        dbHelper.deleteCompletedTasks();
+
+        //refresh
+        loadTasks();
+
+        //send notif to user
+        Toast.makeText(this, "Completed tasks deleted!", Toast.LENGTH_SHORT).show();
     }
 
     private void loadTasks() {

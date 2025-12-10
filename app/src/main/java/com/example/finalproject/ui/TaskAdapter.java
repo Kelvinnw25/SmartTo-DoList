@@ -38,35 +38,52 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
     public void onBindViewHolder(@NonNull TaskViewHolder holder, int position) {
         Task currentTask = taskList.get(position);
 
-        //show data
         holder.tvTitle.setText(currentTask.getTitle());
+
+        holder.cbCompleted.setOnCheckedChangeListener(null);
         holder.cbCompleted.setChecked(currentTask.isCompleted());
-        holder.tvScore.setText(String.format(Locale.getDefault(), "Skor: %.2f", currentTask.getPriorityScore()));
 
         //deadline format
         SimpleDateFormat sdf = new SimpleDateFormat("dd MMM, HH:mm", Locale.getDefault());
         String deadlineDate = sdf.format(currentTask.getDeadlineTimestamp());
         holder.tvDeadline.setText("Deadline: " + deadlineDate);
 
-        //score color (visual)
-        if (currentTask.getPriorityScore() > 80) { // Contoh: Prioritas Sangat Tinggi
+        //score view logic
+        double score = currentTask.getPriorityScore();
+        if (score > 1000000) { // Cek angka besar
+            holder.tvScore.setText("OVERDUE!");
             holder.tvScore.setTextColor(Color.RED);
-        } else if (currentTask.getPriorityScore() > 40) { // Contoh: Prioritas Sedang
-            holder.tvScore.setTextColor(Color.parseColor("#FFC107")); // Kuning
         } else {
-            holder.tvScore.setTextColor(Color.GRAY);
+            holder.tvScore.setText(String.format(Locale.getDefault(), "Skor: %.2f", score));
+
+            //normal score color
+            if (score > 80) holder.tvScore.setTextColor(Color.RED);
+            else if (score > 40) holder.tvScore.setTextColor(Color.parseColor("#FFC107"));
+            else holder.tvScore.setTextColor(Color.GRAY);
         }
 
-        //task done (visual)
+        //visual if task is completed
         if (currentTask.isCompleted()) {
             holder.tvTitle.setTextColor(Color.GRAY);
         } else {
             holder.tvTitle.setTextColor(Color.BLACK);
         }
 
-        //listener for checkbox
         holder.cbCompleted.setOnCheckedChangeListener((buttonView, isChecked) -> {
+            //update status
+            currentTask.setCompleted(isChecked);
 
+            //update visual
+            if (isChecked) {
+                holder.tvTitle.setTextColor(Color.GRAY);
+            } else {
+                holder.tvTitle.setTextColor(Color.BLACK);
+            }
+
+            //update database
+            com.example.finalproject.database.DatabaseHelper db = new com.example.finalproject.database.DatabaseHelper(context);
+            db.updateTaskStatus(currentTask.getId(), isChecked);
+            db.close();
         });
     }
 
