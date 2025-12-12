@@ -10,10 +10,8 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-// Import komponen Material Design (untuk input text)
 import com.google.android.material.textfield.TextInputEditText;
 
-// Import class buatan kita
 import com.example.finalproject.R;
 import com.example.finalproject.database.DatabaseHelper;
 import com.example.finalproject.model.Task;
@@ -25,12 +23,10 @@ import java.util.Locale;
 
 public class TaskDetailActivity extends AppCompatActivity {
 
-    // Variabel untuk Database dan Logic Waktu
     private DatabaseHelper dbHelper;
     private Calendar deadlineCalendar;
-    private long finalDeadlineTimestamp = 0; // Default 0 (belum dipilih)
+    private long finalDeadlineTimestamp = 0;
 
-    // Deklarasi View (Komponen UI)
     private TextInputEditText inputTitle, inputDescription;
     private Spinner spinnerImportance;
     private TextView tvSelectedDeadline;
@@ -41,11 +37,10 @@ public class TaskDetailActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_detail);
 
-        // 1. Inisialisasi
         dbHelper = new DatabaseHelper(this);
-        deadlineCalendar = Calendar.getInstance(); // Ambil waktu sekarang sebagai default
+        deadlineCalendar = Calendar.getInstance();
 
-        // 2. Binding Views (Hubungkan variable dengan ID di XML)
+        //connect var with id in xml
         inputTitle = findViewById(R.id.input_title);
         inputDescription = findViewById(R.id.input_description);
         spinnerImportance = findViewById(R.id.spinner_importance);
@@ -53,32 +48,26 @@ public class TaskDetailActivity extends AppCompatActivity {
         btnSelectDeadline = findViewById(R.id.btn_select_deadline);
         btnSaveTask = findViewById(R.id.btn_save_task);
 
-        // 3. Pasang Listener (Aksi Klik)
-
-        // Klik tombol pilih deadline -> Munculkan Date Picker
+        //listener
         btnSelectDeadline.setOnClickListener(v -> showDateTimePicker());
 
-        // Klik tombol simpan -> Jalankan proses penyimpanan
         btnSaveTask.setOnClickListener(v -> saveTask());
     }
 
-    // Method untuk menampilkan DatePicker lalu TimePicker berurutan
+    //method for show datepicker
     private void showDateTimePicker() {
-        // A. Tampilkan Date Picker
+        //show datepicker
         new DatePickerDialog(this, (view, year, month, dayOfMonth) -> {
             deadlineCalendar.set(Calendar.YEAR, year);
             deadlineCalendar.set(Calendar.MONTH, month);
             deadlineCalendar.set(Calendar.DAY_OF_MONTH, dayOfMonth);
 
-            // B. Setelah tanggal dipilih, langsung Tampilkan Time Picker
             new TimePickerDialog(this, (timeView, hourOfDay, minute) -> {
                 deadlineCalendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
                 deadlineCalendar.set(Calendar.MINUTE, minute);
 
-                // Simpan hasil pilihan ke variabel timestamp
                 finalDeadlineTimestamp = deadlineCalendar.getTimeInMillis();
 
-                // Update teks di layar agar user tahu apa yang dipilih
                 updateDeadlineLabel();
 
             }, deadlineCalendar.get(Calendar.HOUR_OF_DAY), deadlineCalendar.get(Calendar.MINUTE), true).show();
@@ -86,23 +75,22 @@ public class TaskDetailActivity extends AppCompatActivity {
         }, deadlineCalendar.get(Calendar.YEAR), deadlineCalendar.get(Calendar.MONTH), deadlineCalendar.get(Calendar.DAY_OF_MONTH)).show();
     }
 
-    // Method untuk mengubah format tanggal jadi teks yang mudah dibaca (Contoh: Senin, 12 Des 2025, 14:00)
+    //method for change date to readable text
     private void updateDeadlineLabel() {
         SimpleDateFormat sdf = new SimpleDateFormat("EEEE, dd MMM yyyy, HH:mm", new Locale("id", "ID"));
         tvSelectedDeadline.setText("Deadline: " + sdf.format(deadlineCalendar.getTime()));
     }
 
-    // Method Utama untuk Menyimpan Tugas
+    //main method
     private void saveTask() {
-        // A. Ambil data dari inputan
+        //take data from input
         String title = inputTitle.getText().toString().trim();
         String description = inputDescription.getText().toString().trim();
 
-        // Ambil posisi spinner (0-4), tambah 1 biar jadi level (1-5)
         int importanceIndex = spinnerImportance.getSelectedItemPosition();
         int importanceLevel = importanceIndex + 1;
 
-        // B. Validasi Input (Cegah data kosong)
+        //validate input
         if (title.isEmpty()) {
             inputTitle.setError("Judul wajib diisi!");
             return;
@@ -112,7 +100,6 @@ public class TaskDetailActivity extends AppCompatActivity {
             return;
         }
 
-        // C. Buat Objek Task Baru (Pakai Static Factory Method yang sudah kita buat)
         Task newTask = Task.createNewTask(
                 title,
                 description,
@@ -120,18 +107,51 @@ public class TaskDetailActivity extends AppCompatActivity {
                 importanceLevel
         );
 
-        // D. HITUNG SKOR PRIORITAS (Inti dari aplikasi Smart To-Do List)
+        //calculate priority score
         double calculatedScore = PriorityCalculator.calculateScore(newTask);
-        newTask.setPriorityScore(calculatedScore); // Masukkan skor ke objek task
+        newTask.setPriorityScore(calculatedScore);
 
-        // E. Simpan ke Database
+        //save to db
         long result = dbHelper.addTask(newTask);
 
         if (result != -1) {
+            //set alarm here
+            scheduleNotification(finalDeadlineTimestamp, title, (int) result);
             Toast.makeText(this, "Tugas berhasil disimpan!", Toast.LENGTH_SHORT).show();
-            finish(); // Tutup halaman ini dan kembali ke MainActivity
+            finish();
         } else {
             Toast.makeText(this, "Gagal menyimpan tugas.", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    //method for set alarm
+    private void scheduleNotification(long timeInMillis, String taskTitle, int taskId) {
+        if (timeInMillis <= System.currentTimeMillis()) {
+            return;
+        }
+
+        android.app.AlarmManager alarmManager = (android.app.AlarmManager) getSystemService(android.content.Context.ALARM_SERVICE);
+
+        //provide intent for NotificationReceiver
+        android.content.Intent intent = new android.content.Intent(this, com.example.finalproject.utils.NotificationReceiver.class);
+        intent.putExtra("title", taskTitle);
+        intent.putExtra("id", taskId);
+
+        //wrap intent with pendingIntent
+        android.app.PendingIntent pendingIntent = android.app.PendingIntent.getBroadcast(
+                this,
+                taskId, // ID unik
+                intent,
+                android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
+        );
+
+        //set alarm
+        if (alarmManager != null) {
+            alarmManager.setExactAndAllowWhileIdle(
+                    android.app.AlarmManager.RTC_WAKEUP,
+                    timeInMillis,
+                    pendingIntent
+            );
         }
     }
 }
