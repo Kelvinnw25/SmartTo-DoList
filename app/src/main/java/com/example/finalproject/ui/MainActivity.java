@@ -71,7 +71,7 @@ public class MainActivity extends AppCompatActivity {
         PopupMenu popup = new PopupMenu(this, view);
 
         //add menu "Delete Completed Tasks"
-        popup.getMenu().add(0, 1, 0, "Delete Completed Tasks");
+        popup.getMenu().add(0, 1, 0, "Delete Task");
 
         //listener for popup
         popup.setOnMenuItemClickListener(item -> {

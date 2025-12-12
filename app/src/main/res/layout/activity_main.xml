@@ -27,7 +27,9 @@
         android:layout_marginEnd="24dp"
         android:layout_marginBottom="24dp"
         android:src="@drawable/ic_add_white_24dp"
-        app:tint="@android:color/white"
+
+        app:backgroundTint="@color/colorPrimary"
+        app:tint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:contentDescription="Tambahkan Tugas Baru" />
@@ -49,12 +51,12 @@
         android:layout_height="56dp"
         android:layout_marginStart="24dp"
         android:layout_marginBottom="24dp"
+
         android:background="@drawable/btn_primary_rounded"
-        android:backgroundTint="#FFFFFF"
+        android:backgroundTint="@color/colorPrimary"
         android:src="@drawable/ic_more_vert"
-        android:contentDescription="Opsi Lainnya"
+        app:tint="@color/white"
         android:elevation="6dp"
-        app:tint="@color/colorPrimary"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent" />
 
