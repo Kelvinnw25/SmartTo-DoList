@@ -2,6 +2,7 @@
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
     android:background="@drawable/bg_gradient_blue"
     android:padding="16dp">
 
@@ -17,7 +18,7 @@
             android:layout_height="40dp"
             android:background="?attr/selectableItemBackgroundBorderless"
             android:src="@drawable/ic_arrow_back"
-            android:contentDescription="Back Button"
+            android:contentDescription="@string/back_button"
             android:padding="8dp"
             android:scaleType="fitCenter"/>
 
@@ -79,9 +80,11 @@
                     android:layout_width="0dp"
                     android:layout_weight="1"
                     android:layout_height="wrap_content"
-                    android:text="@string/high_priority"
-                    android:textStyle="bold"
-                    android:textColor="#D32F2F"/>
+                    android:text="Loading..."
+                    android:textColor="@color/black"
+                    tools:text="High Priority"
+                    tools:textColor="#D32F2F"
+                    android:textStyle="bold" />
 
                 <Spinner
                     android:id="@+id/spinnerStatus"

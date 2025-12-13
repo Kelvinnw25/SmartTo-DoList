@@ -9,6 +9,8 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import com.example.finalproject.R;
 import com.example.finalproject.database.DatabaseHelper;
 
@@ -51,6 +53,7 @@ public class DetailTaskSelected extends AppCompatActivity {
         String category = getIntent().getStringExtra("EXTRA_CATEGORY");
         long deadlineTimestamp = getIntent().getLongExtra("EXTRA_DEADLINE", 0);
         int importance = getIntent().getIntExtra("EXTRA_IMPORTANCE", 1);
+        //          Toast.makeText(this, "Importance Number Received: " + importance, Toast.LENGTH_LONG).show();
         boolean isCompleted = getIntent().getBooleanExtra("EXTRA_COMPLETED", false);
 
         // 3. Set Text Simple
@@ -70,21 +73,8 @@ public class DetailTaskSelected extends AppCompatActivity {
             tvDeadline.setText("-");
         }
 
-        // 5. Logic Text & Warna Prioritas
-        switch (importance) {
-            case 3: // High
-                tvPriority.setText("High Priority");
-                tvPriority.setTextColor(Color.RED);
-                break;
-            case 2: // Medium
-                tvPriority.setText("Medium Priority");
-                tvPriority.setTextColor(Color.parseColor("#FFA000")); // Orange
-                break;
-            default: // Low
-                tvPriority.setText("Low Priority");
-                tvPriority.setTextColor(Color.parseColor("#388E3C")); // Hijau
-                break;
-        }
+        // 5. Set Tampilan Awal (Gunakan method helper)
+        updatePriorityView(tvPriority, isCompleted, importance);
 
         // 6. Logic Status (Fixed for Spinner)
         if (isCompleted) {
@@ -98,11 +88,13 @@ public class DetailTaskSelected extends AppCompatActivity {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 if (taskId != -1) {
-                    // Posisi 1 = Done (True), Posisi 0 = Pending (False)
                     boolean newStatus = (position == 1);
 
-                    // Update Database
+                    // 1. Update Database
                     dbHelper.updateTaskStatus(taskId, newStatus);
+
+                    // 2. [TAMBAHKAN INI] Update Tampilan Teks jadi DONE/Prioritas
+                    updatePriorityView(tvPriority, newStatus, importance);
                 }
             }
 
@@ -111,5 +103,39 @@ public class DetailTaskSelected extends AppCompatActivity {
                 // Do nothing
             }
         });
+    }
+
+    private void updatePriorityView(TextView tvPriority, boolean isDone, int importance) {
+        if (isDone) {
+            tvPriority.setText("DONE");
+            tvPriority.setTextColor(Color.parseColor("#388E3C")); // Hijau Mantap
+        } else {
+            switch (importance) {
+                case 5: // Urgent
+                    tvPriority.setText("Urgent");
+                    tvPriority.setTextColor(Color.parseColor("#B71C1C")); // Merah Gelap (Darah)
+                    break;
+                case 4: // High
+                    tvPriority.setText("High");
+                    tvPriority.setTextColor(Color.RED); // Merah Terang
+                    break;
+                case 3: // Medium
+                    tvPriority.setText("Medium");
+                    tvPriority.setTextColor(Color.parseColor("#FF9800")); // Oranye
+                    break;
+                case 2: // Low
+                    tvPriority.setText("Low");
+                    tvPriority.setTextColor(Color.parseColor("#4CAF50")); // Hijau Standar
+                    break;
+                case 1: // Very Low
+                    tvPriority.setText("Very Low");
+                    tvPriority.setTextColor(Color.parseColor("#8BC34A")); // Hijau Muda (Santai)
+                    break;
+                default:
+                    tvPriority.setText("No Priority");
+                    tvPriority.setTextColor(Color.GRAY);
+                    break;
+            }
+        }
     }
 }
