@@ -3,13 +3,14 @@
     <string name="add_new_task">Add New Task</string>
     <string name="no_tasks_here_tap_to_get_started">No tasks here. Tap + to get started!</string>
     <string name="more_menu_button">more menu button</string>
-    <string name="judul_task_disini">Judul Task Disini</string>
+    <string name="task_title_here">Task Title Here</string>
     <string name="pending">⏳ Pending</string>
     <string name="fill_with_long_task_description">Fill With Long Task Description</string>
     <string name="description">Description</string>
     <string name="high_priority">High Priority</string>
-    <string name="category_kuliah">Category: Kuliah</string>
+    <string name="category_kuliah">Category: School</string>
     <string name="_12_dec_2025_10_00">12 Dec 2025, 10:00</string>
+
     <string-array name="importance_levels">
         <item>1 - Very Low</item>
         <item>2 - Low</item>
@@ -22,6 +23,11 @@
         <item>General</item>
         <item>School</item>
         <item>Work</item>
+    </string-array>
+
+    <string-array name="status_options">
+        <item>Pending</item>
+        <item>Done</item>
     </string-array>
 
 </resources>
