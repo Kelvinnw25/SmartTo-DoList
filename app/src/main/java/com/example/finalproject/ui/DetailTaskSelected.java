@@ -38,7 +38,7 @@ public class DetailTaskSelected extends AppCompatActivity {
             finish();
         });
 
-        // 1. Init Views
+        //init views
         TextView tvTitle = findViewById(R.id.tvDetailTitle);
         TextView tvDesc = findViewById(R.id.tvDetailDesc);
         TextView tvCategory = findViewById(R.id.tvDetailCategory);
@@ -46,25 +46,24 @@ public class DetailTaskSelected extends AppCompatActivity {
         TextView tvPriority = findViewById(R.id.tvDetailPriority);
         Spinner spinnerStatus = findViewById(R.id.spinnerStatus);
 
-        // 2. Tangkap Data dari Intent
+        //take data from intent
         taskId = getIntent().getIntExtra("EXTRA_ID", -1);
         String title = getIntent().getStringExtra("EXTRA_TITLE");
         String desc = getIntent().getStringExtra("EXTRA_DESC");
         String category = getIntent().getStringExtra("EXTRA_CATEGORY");
         long deadlineTimestamp = getIntent().getLongExtra("EXTRA_DEADLINE", 0);
         int importance = getIntent().getIntExtra("EXTRA_IMPORTANCE", 1);
-        //          Toast.makeText(this, "Importance Number Received: " + importance, Toast.LENGTH_LONG).show();
         boolean isCompleted = getIntent().getBooleanExtra("EXTRA_COMPLETED", false);
 
-        // 3. Set Text Simple
+        //set text simple
         tvTitle.setText(title);
         tvDesc.setText(desc);
 
-        // Handle Category null
+        //handle category null
         if(category == null) category = "-";
         tvCategory.setText("Category: " + category);
 
-        // 4. Format Tanggal (Timestamp -> Bacaan Manusia)
+        //date format
         if (deadlineTimestamp != 0) {
             SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm", new Locale("id", "ID"));
             String dateStr = sdf.format(new Date(deadlineTimestamp));
@@ -73,17 +72,16 @@ public class DetailTaskSelected extends AppCompatActivity {
             tvDeadline.setText("-");
         }
 
-        // 5. Set Tampilan Awal (Gunakan method helper)
         updatePriorityView(tvPriority, isCompleted, importance);
 
-        // 6. Logic Status (Fixed for Spinner)
+        //logic status
         if (isCompleted) {
-            spinnerStatus.setSelection(1); // Index 1 = Done
+            spinnerStatus.setSelection(1); //index 1 = Done
         } else {
-            spinnerStatus.setSelection(0); // Index 0 = Pending
+            spinnerStatus.setSelection(0); //index 0 = Pending
         }
 
-        // Listener saat user mengubah status lewat spinner
+        //listener when user change status from spinner
         spinnerStatus.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
@@ -111,25 +109,25 @@ public class DetailTaskSelected extends AppCompatActivity {
             tvPriority.setTextColor(Color.parseColor("#388E3C")); // Hijau Mantap
         } else {
             switch (importance) {
-                case 5: // Urgent
+                case 5:
                     tvPriority.setText("Urgent");
-                    tvPriority.setTextColor(Color.parseColor("#B71C1C")); // Merah Gelap (Darah)
+                    tvPriority.setTextColor(Color.parseColor("#B71C1C"));//dark red
                     break;
-                case 4: // High
+                case 4:
                     tvPriority.setText("High");
-                    tvPriority.setTextColor(Color.RED); // Merah Terang
+                    tvPriority.setTextColor(Color.RED);//light red
                     break;
-                case 3: // Medium
+                case 3:
                     tvPriority.setText("Medium");
-                    tvPriority.setTextColor(Color.parseColor("#FF9800")); // Oranye
+                    tvPriority.setTextColor(Color.parseColor("#FF9800"));//orange
                     break;
-                case 2: // Low
+                case 2:
                     tvPriority.setText("Low");
-                    tvPriority.setTextColor(Color.parseColor("#4CAF50")); // Hijau Standar
+                    tvPriority.setTextColor(Color.parseColor("#4CAF50"));//standard green
                     break;
-                case 1: // Very Low
+                case 1:
                     tvPriority.setText("Very Low");
-                    tvPriority.setTextColor(Color.parseColor("#8BC34A")); // Hijau Muda (Santai)
+                    tvPriority.setTextColor(Color.parseColor("#8BC34A"));//light green
                     break;
                 default:
                     tvPriority.setText("No Priority");

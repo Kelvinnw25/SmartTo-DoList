@@ -16,11 +16,11 @@ public class NotificationReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        // 1. Ambil data Judul dan ID yang dikirim dari Alarm
+        //take title and ID from alarm
         String taskTitle = intent.getStringExtra("title");
         int taskId = intent.getIntExtra("id", 0);
 
-        // 2. Munculkan Notifikasi
+        //show notification
         showNotification(context, taskTitle, taskId);
     }
 
@@ -30,14 +30,14 @@ public class NotificationReceiver extends BroadcastReceiver {
 
         NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Wajib buat Android Oreo ke atas: Bikin Channel Notifikasi
+        //notification channel
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(channelId, channelName, NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("Notifikasi untuk deadline tugas");
             notificationManager.createNotificationChannel(channel);
         }
 
-        // Intent supaya kalau notif diklik, aplikasi kebuka ke halaman utama
+        //intent when user click notification, go to main page
         Intent openAppIntent = new Intent(context, MainActivity.class);
         openAppIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
@@ -48,7 +48,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // Desain Tampilan Notifikasi
+        //notification design
         NotificationCompat.Builder builder = new NotificationCompat.Builder(context, channelId)
                 .setSmallIcon(R.mipmap.ic_launcher) // Ikon aplikasi
                 .setContentTitle("Deadline Reminder! ⏰")
@@ -57,7 +57,7 @@ public class NotificationReceiver extends BroadcastReceiver {
                 .setContentIntent(pendingIntent)
                 .setAutoCancel(true); // Hilang otomatis kalau diklik
 
-        // Tampilkan!
+        //show
         if (notificationManager != null) {
             notificationManager.notify(taskId, builder.build());
         }

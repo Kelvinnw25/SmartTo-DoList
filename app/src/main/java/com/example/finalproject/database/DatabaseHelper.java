@@ -10,15 +10,15 @@ import java.util.List;
 import android.database.Cursor;
 
 public class DatabaseHelper extends SQLiteOpenHelper {
-    // Database Info
+    //Database Info
     private static final String DATABASE_NAME = "priolistdb";
     private static final int DATABASE_VERSION = 2;
 
-    // Table Name
+    //Table Name
     public static final String TABLE_TASKS = "tasks";
 
-    // Task Table Columns
-    public static final String COLUMN_ID = "_id"; // Primary Key standar
+    //Task Table Columns
+    public static final String COLUMN_ID = "_id";
     public static final String COLUMN_TITLE = "title";
     public static final String COLUMN_DESCRIPTION = "description";
     public static final String COLUMN_DEADLINE = "deadline_timestamp";
@@ -27,7 +27,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_PRIORITY_SCORE = "priority_score";
     public static final String COLUMN_CATEGORY = "category";
 
-    // Constructor
+    //Constructor
     public DatabaseHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
