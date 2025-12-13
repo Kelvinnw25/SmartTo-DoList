@@ -29,6 +29,7 @@ public class TaskDetailActivity extends AppCompatActivity {
 
     private TextInputEditText inputTitle, inputDescription;
     private Spinner spinnerImportance;
+    private Spinner spinnerCategory;
     private TextView tvSelectedDeadline;
     private Button btnSelectDeadline, btnSaveTask;
 
@@ -44,6 +45,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         inputTitle = findViewById(R.id.input_title);
         inputDescription = findViewById(R.id.input_description);
         spinnerImportance = findViewById(R.id.spinner_importance);
+        spinnerCategory = findViewById(R.id.spinner_category);
         tvSelectedDeadline = findViewById(R.id.tv_selected_deadline);
         btnSelectDeadline = findViewById(R.id.btn_select_deadline);
         btnSaveTask = findViewById(R.id.btn_save_task);
@@ -87,8 +89,11 @@ public class TaskDetailActivity extends AppCompatActivity {
         String title = inputTitle.getText().toString().trim();
         String description = inputDescription.getText().toString().trim();
 
+        //take importance
         int importanceIndex = spinnerImportance.getSelectedItemPosition();
         int importanceLevel = importanceIndex + 1;
+        //take category
+        String category = spinnerCategory.getSelectedItem().toString();
 
         //validate input
         if (title.isEmpty()) {
@@ -104,7 +109,8 @@ public class TaskDetailActivity extends AppCompatActivity {
                 title,
                 description,
                 finalDeadlineTimestamp,
-                importanceLevel
+                importanceLevel,
+                category
         );
 
         //calculate priority score
@@ -117,10 +123,10 @@ public class TaskDetailActivity extends AppCompatActivity {
         if (result != -1) {
             //set alarm here
             scheduleNotification(finalDeadlineTimestamp, title, (int) result);
-            Toast.makeText(this, "Tugas berhasil disimpan!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Task Saved!", Toast.LENGTH_SHORT).show();
             finish();
         } else {
-            Toast.makeText(this, "Gagal menyimpan tugas.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Failed to Save Task!", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -140,7 +146,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         //wrap intent with pendingIntent
         android.app.PendingIntent pendingIntent = android.app.PendingIntent.getBroadcast(
                 this,
-                taskId, // ID unik
+                taskId,
                 intent,
                 android.app.PendingIntent.FLAG_UPDATE_CURRENT | android.app.PendingIntent.FLAG_IMMUTABLE
         );

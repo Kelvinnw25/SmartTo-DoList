@@ -12,7 +12,7 @@ import android.database.Cursor;
 public class DatabaseHelper extends SQLiteOpenHelper {
     // Database Info
     private static final String DATABASE_NAME = "priolistdb";
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
 
     // Table Name
     public static final String TABLE_TASKS = "tasks";
@@ -25,6 +25,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     public static final String COLUMN_IMPORTANCE = "importance_level";
     public static final String COLUMN_IS_COMPLETED = "is_completed";
     public static final String COLUMN_PRIORITY_SCORE = "priority_score";
+    public static final String COLUMN_CATEGORY = "category";
 
     // Constructor
     public DatabaseHelper(Context context) {
@@ -42,7 +43,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 COLUMN_DEADLINE + " INTEGER," +
                 COLUMN_IMPORTANCE + " INTEGER," +
                 COLUMN_IS_COMPLETED + " INTEGER," +
-                COLUMN_PRIORITY_SCORE + " REAL" + //decimal number
+                COLUMN_PRIORITY_SCORE + " REAL," +
+                COLUMN_CATEGORY + " TEXT" +
                 ")";
 
         db.execSQL(CREATE_TASKS_TABLE);
@@ -74,7 +76,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         if (oldVersion != newVersion) {
-            // Drop tabel lama dan buat yang baru
+            //drop old table and create the new one
             db.execSQL("DROP TABLE IF EXISTS " + TABLE_TASKS);
             onCreate(db);
         }
@@ -91,6 +93,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         values.put(COLUMN_IMPORTANCE, task.getImportanceLevel());
         values.put(COLUMN_IS_COMPLETED, task.isCompleted() ? 1 : 0);
         values.put(COLUMN_PRIORITY_SCORE, task.getPriorityScore());
+        values.put(COLUMN_CATEGORY, task.getCategory());
 
         long id = db.insert(TABLE_TASKS, null, values);
         db.close();
@@ -119,11 +122,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                 String description = cursor.getString(cursor.getColumnIndexOrThrow(COLUMN_DESCRIPTION));
                 long deadlineTimestamp = cursor.getLong(cursor.getColumnIndexOrThrow(COLUMN_DEADLINE));
                 int importanceLevel = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IMPORTANCE));
-
                 //convert int to boolean
                 boolean isCompleted = cursor.getInt(cursor.getColumnIndexOrThrow(COLUMN_IS_COMPLETED)) == 1;
-
                 double priorityScore = cursor.getDouble(cursor.getColumnIndexOrThrow(COLUMN_PRIORITY_SCORE));
+                int catIndex = cursor.getColumnIndex(COLUMN_CATEGORY);
+                String category = (catIndex != -1) ? cursor.getString(catIndex) : "General";
+                if(category == null) category = "General";
 
                 //static factory for create object Task
                 Task task = Task.fromDatabase(
@@ -133,7 +137,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                         deadlineTimestamp,
                         importanceLevel,
                         isCompleted,
-                        priorityScore
+                        priorityScore,
+                        category
                 );
 
                 taskList.add(task);
@@ -147,10 +152,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return taskList;
     }
 
-    // Method untuk menghapus SEMUA tugas yang sudah dicentang (selesai)
+    //method for delete all completed task
     public void deleteCompletedTasks() {
         SQLiteDatabase db = this.getWritableDatabase();
-        // Hapus baris di mana kolom is_completed bernilai 1 (true)
+        //delete row where column is_completed = 1
         db.delete(TABLE_TASKS, COLUMN_IS_COMPLETED + " = ?", new String[]{"1"});
         db.close();
     }

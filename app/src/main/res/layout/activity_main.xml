@@ -32,13 +32,13 @@
         app:tint="@color/white"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:contentDescription="Tambahkan Tugas Baru" />
+        android:contentDescription="@string/add_new_task" />
 
     <TextView
         android:id="@+id/tv_empty_state"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Tidak ada tugas. Klik + untuk memulai!"
+        android:text="@string/no_tasks_here_tap_to_get_started"
         android:visibility="gone"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
@@ -54,6 +54,7 @@
 
         android:background="@drawable/btn_primary_rounded"
         android:backgroundTint="@color/colorPrimary"
+        android:contentDescription="@string/more_menu_button"
         android:src="@drawable/ic_more_vert"
         app:tint="@color/white"
         android:elevation="6dp"

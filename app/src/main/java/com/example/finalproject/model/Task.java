@@ -1,5 +1,9 @@
 package com.example.finalproject.model;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class Task {
 
     private int id;
@@ -8,15 +12,16 @@ public class Task {
     private long deadlineTimestamp;
     private int importanceLevel;
     private boolean isCompleted;
-    private double priorityScore; //untuk menentukan priority scorenya
+    private double priorityScore;
+    private String category;
 
-    //constructor kosong
+    //empty constructor
     public Task() {
 
     }
 
     //Full Constructor (with ID)
-    private Task(int id, String title, String description, long deadlineTimestamp, int importanceLevel, boolean isCompleted, double priorityScore) {
+    private Task(int id, String title, String description, long deadlineTimestamp, int importanceLevel, boolean isCompleted, double priorityScore, String category) {
         this.id = id;
         this.title = title;
         this.description = description;
@@ -24,27 +29,31 @@ public class Task {
         this.importanceLevel = importanceLevel;
         this.isCompleted = isCompleted;
         this.priorityScore = priorityScore;
+        this.category = category;
     }
 
     //Constructor for Insert (without ID)
-    private Task(String title, String description, long deadlineTimestamp, int importanceLevel, boolean isCompleted, double priorityScore) {
-        // ID diabaikan karena akan diisi oleh SQLite
+    private Task(String title, String description, long deadlineTimestamp, int importanceLevel, boolean isCompleted, double priorityScore, String category) {
+        //ID ignored, filled automatically by SQLite
         this.title = title;
         this.description = description;
         this.deadlineTimestamp = deadlineTimestamp;
         this.importanceLevel = importanceLevel;
         this.isCompleted = isCompleted;
         this.priorityScore = priorityScore;
+        this.category = category;
     }
 
     //WRITE
-    public static Task createNewTask(String title, String description, long deadlineTimestamp, int importanceLevel) {
-        return new Task(title, description, deadlineTimestamp, importanceLevel, false, 0.0);
+    public static Task createNewTask(String title, String description, long deadlineTimestamp, int importanceLevel, String category) {
+        //Default isCompleted = false, priorityScore = 0.0
+        return new Task(title, description, deadlineTimestamp, importanceLevel, false, 0.0, category);
     }
 
     //READ
-    public static Task fromDatabase(int id, String title, String description, long deadlineTimestamp, int importanceLevel, boolean isCompleted, double priorityScore) {
-        return new Task(id, title, description, deadlineTimestamp, importanceLevel, isCompleted, priorityScore);
+    public static Task fromDatabase(int id, String title, String description, long deadlineTimestamp,
+                                    int importanceLevel, boolean isCompleted, double priorityScore, String category) {
+        return new Task(id, title, description, deadlineTimestamp, importanceLevel, isCompleted, priorityScore, category);
     }
 
     public int getId() {
@@ -103,4 +112,29 @@ public class Task {
         this.priorityScore = priorityScore;
     }
 
+    public String getCategory() { return category; }
+    public void setCategory(String category) { this.category = category; }
+
+    //helper methods
+    //convert timestamp to string date (ex: "12 Dec 2025")
+    public String getFormattedDate() {
+        if (deadlineTimestamp == 0) return "-";
+        SimpleDateFormat sdf = new SimpleDateFormat("dd MMM yyyy", Locale.getDefault());
+        return sdf.format(new Date(deadlineTimestamp));
+    }
+
+    //convert importance Level (int) to string label
+    public String getPriorityLabel() {
+        switch (importanceLevel) {
+            case 3: return "High Priority";
+            case 2: return "Medium Priority";
+            case 1: return "Low Priority";
+            default: return "Normal";
+        }
+    }
+
+    //convert boolean to status text
+    public String getStatusLabel() {
+        return isCompleted ? "Done" : "Pending";
+    }
 }

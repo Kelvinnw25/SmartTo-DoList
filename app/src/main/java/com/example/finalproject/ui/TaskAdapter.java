@@ -1,6 +1,7 @@
 package com.example.finalproject.ui;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Color;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -84,6 +85,20 @@ public class TaskAdapter extends RecyclerView.Adapter<TaskAdapter.TaskViewHolder
             com.example.finalproject.database.DatabaseHelper db = new com.example.finalproject.database.DatabaseHelper(context);
             db.updateTaskStatus(currentTask.getId(), isChecked);
             db.close();
+        });
+
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, DetailTaskSelected.class);
+
+            //wrap all task datas with intent
+            intent.putExtra("EXTRA_TITLE", currentTask.getTitle());
+            intent.putExtra("EXTRA_DESC", currentTask.getDescription());
+            intent.putExtra("EXTRA_CATEGORY", currentTask.getCategory()); // Pastikan di Task.java sudah ada getCategory()
+            intent.putExtra("EXTRA_DEADLINE", currentTask.getDeadlineTimestamp());
+            intent.putExtra("EXTRA_IMPORTANCE", currentTask.getImportanceLevel());
+            intent.putExtra("EXTRA_COMPLETED", currentTask.isCompleted());
+
+            context.startActivity(intent);
         });
     }
 
