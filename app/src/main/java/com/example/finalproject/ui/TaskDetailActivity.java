@@ -88,20 +88,7 @@ public class TaskDetailActivity extends AppCompatActivity {
         //take data from input
         String title = inputTitle.getText().toString().trim();
         String description = inputDescription.getText().toString().trim();
-
-        //select level from text
-        String selectedImportance = spinnerImportance.getSelectedItem().toString();
-        int importanceLevel = 1; // Default ke Low (1)
-
-        // Cek isi teksnya (Case insensitive biar aman)
-        if (selectedImportance.contains("High")) {
-            importanceLevel = 3;
-        } else if (selectedImportance.contains("Medium")) {
-            importanceLevel = 2;
-        } else {
-            // Kalau Low atau teks lain (misal "Select Priority"), anggap Low
-            importanceLevel = 1;
-        }
+        int importanceLevel = spinnerImportance.getSelectedItemPosition() + 1;
 
         //take category
         String category = spinnerCategory.getSelectedItem().toString();
