@@ -1,7 +1,22 @@
-/local.properties
-/local
-.DS_Store/build
-/app/build
-.idea/caches.gradle/
-*.iml 
-.idea/workspace.xml
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file (pribadi)
+local.properties
+
+# Android Studio files
+.idea/
+.navigation/
+*.iml
+*.ids
+*.xml
+*.log
+
+# Generated files
+generated/
+captures/
+
+# OS specific
+.DS_Store
+Thumbs.db

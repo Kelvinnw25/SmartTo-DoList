@@ -95,11 +95,11 @@ public class TaskDetailActivity extends AppCompatActivity {
 
         //validate input
         if (title.isEmpty()) {
-            inputTitle.setError("Judul wajib diisi!");
+            inputTitle.setError("Title is required!");
             return;
         }
         if (finalDeadlineTimestamp == 0) {
-            Toast.makeText(this, "Mohon pilih tanggal deadline!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Please choose the deadline!", Toast.LENGTH_SHORT).show();
             return;
         }
 

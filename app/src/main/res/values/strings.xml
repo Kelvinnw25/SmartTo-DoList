@@ -14,6 +14,9 @@
     <string name="more_options">More Options</string>
     <string name="smart_task">Smart To-Do List</string>
     <string name="open_ai_chat">Open AI Chat</string>
+    <string name="send">Send</string>
+    <string name="paste_your_task_here">Paste your task here...</string>
+    <string name="smart_assistant">Smart Assistant</string>
 
     <string-array name="importance_levels">
         <item>1 - Very Low</item>

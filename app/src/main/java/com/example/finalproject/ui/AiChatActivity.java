@@ -19,6 +19,9 @@ import com.example.finalproject.model.Task;
 import com.example.finalproject.model.TaskDraft;
 import com.google.gson.Gson;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Call;
@@ -54,7 +57,7 @@ public class AiChatActivity extends AppCompatActivity {
         rvChat.setAdapter(chatAdapter);
 
         // Pesan Sapaan
-        addBotMessage("Halo! Paste info tugasmu di sini, aku akan buatkan reminder otomatis.");
+        addBotMessage("Hello! Paste your task here, i will create you a reminder automatically.");
 
         btnSend.setOnClickListener(v -> {
             String text = etInput.getText().toString();
@@ -71,10 +74,16 @@ public class AiChatActivity extends AppCompatActivity {
         rvChat.scrollToPosition(chatList.size() - 1);
         etInput.setText("");
 
-        // 2. Siapkan Prompt Rahasia
-        String prompt = "Extract info from this text: '" + userText + "'. " +
+        // Ambil waktu sekarang di HP user
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
+        String currentDateTime = sdf.format(new Date());
+
+        // 2. Siapkan Prompt Rahasia (Update Prompt)
+        // Kita "selundupkan" info tanggal hari ini ke prompt
+        String prompt = "Context: Current Date and Time is " + currentDateTime + ". " +
+                "Extract info from this text: '" + userText + "'. " +
                 "Return ONLY a JSON with fields: " +
-                "title (string), description (string), deadline (string format 'yyyy-MM-dd HH:mm', if unsure use tomorrow), " +
+                "title (string), description (string), deadline (string format 'yyyy-MM-dd HH:mm', calculate based on context), " +
                 "importance (int 1-5), category (string). No markdown.";
 
         // 3. Panggil API
@@ -86,7 +95,13 @@ public class AiChatActivity extends AppCompatActivity {
                             String rawResponse = response.body().getOutputText();
                             processAIResponse(rawResponse);
                         } else {
-                            addBotMessage("Gagal konek ke AI :( Cek API Key.");
+                            try {
+                                String errorBody = response.errorBody() != null ? response.errorBody().string() : "Unknown error";
+                                Log.e("GEMINI_ERROR", "Code: " + response.code() + " Message: " + errorBody);
+                                addBotMessage("Gagal (" + response.code() + "): " + response.message());
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
                         }
                     }
 
@@ -99,33 +114,45 @@ public class AiChatActivity extends AppCompatActivity {
 
     private void processAIResponse(String jsonText) {
         try {
-            // Bersihin Markdown kalau AI bandel kasih ```json
+            // 1. Bersihin Markdown (biar JSON bersih)
             jsonText = jsonText.replace("```json", "").replace("```", "").trim();
 
-            // Convert JSON ke Object Java (TaskDraft)
+            // 2. Convert JSON ke Object Java
             Gson gson = new Gson();
             TaskDraft draft = gson.fromJson(jsonText, TaskDraft.class);
 
-            // Convert Date String ke Timestamp (Logic Simpel Dulu)
-            // Di real project lu harus parse SimpleDateFormat
-            long dummyTimestamp = System.currentTimeMillis() + 86400000; // Besok
+            // 3. LOGIC BARU: Parsing Tanggal dari String ke Long
+            long finalDeadline = 0;
+            try {
+                // Format ini harus SAMA PERSIS dengan request prompt kita ('yyyy-MM-dd HH:mm')
+                java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
+                if (draft.deadline != null && !draft.deadline.isEmpty()) {
+                    java.util.Date date = sdf.parse(draft.deadline);
+                    if (date != null) {
+                        finalDeadline = date.getTime();
+                    }
+                }
+            } catch (Exception e) {
+                // Kalau AI gagal kasih format yg bener, default ke 24 jam dari sekarang
+                finalDeadline = System.currentTimeMillis() + 86400000;
+            }
 
-            // Simpan ke Database
+            // 4. Simpan ke Database
             Task newTask = Task.createNewTask(
-                    draft.title != null ? draft.title : "Tugas Baru",
+                    draft.title != null ? draft.title : "Task without title",
                     draft.description,
-                    dummyTimestamp, // Nanti kita benerin logic parsing tanggalnya
+                    finalDeadline, // Pake deadline hasil parsing
                     draft.importance,
                     draft.category != null ? draft.category : "General"
             );
 
             dbHelper.addTask(newTask);
 
-            addBotMessage("✅ Siap! Tugas '" + draft.title + "' berhasil disimpan!");
+            addBotMessage("✅ Okay! Task '" + draft.title + "' saved!");
 
         } catch (Exception e) {
             Log.e("AI_ERROR", "Error parsing: " + e.getMessage());
-            addBotMessage("Waduh, format teksnya susah dimengerti. Coba lagi ya.");
+            addBotMessage("Wow, I can't understand the text format. Please try again.");
         }
     }
 
