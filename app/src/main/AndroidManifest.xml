@@ -33,6 +33,7 @@
         <activity android:name=".ui.DetailTaskSelected"
             android:exported="false"
             android:parentActivityName=".ui.MainActivity"/>
+        <activity android:name=".ui.AiChatActivity" />
     </application>
 
 </manifest>

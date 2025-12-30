@@ -57,7 +57,7 @@ public class MainActivity extends AppCompatActivity {
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
-        //connect variabel with button in layout
+        //connect button with variable
         btnMoreMenu = findViewById(R.id.btn_more_menu);
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -70,6 +70,15 @@ public class MainActivity extends AppCompatActivity {
 
         //listener for 3 dots button
         btnMoreMenu.setOnClickListener(v -> showPopupMenu(v));
+
+        //connect button with variable
+        ImageButton btnOpenAiChat = findViewById(R.id.btn_open_ai_chat);
+
+        //listener for chat button
+        btnOpenAiChat.setOnClickListener(v -> {
+            Intent intent = new Intent(MainActivity.this, AiChatActivity.class);
+            startActivity(intent);
+        });
     }
 
     @Override

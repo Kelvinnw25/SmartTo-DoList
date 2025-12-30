@@ -11,6 +11,9 @@
     <string name="category_kuliah">Category: School</string>
     <string name="_12_dec_2025_10_00">12 Dec 2025, 10:00</string>
     <string name="back_button">Back Button</string>
+    <string name="more_options">More Options</string>
+    <string name="smart_task">Smart To-Do List</string>
+    <string name="open_ai_chat">Open AI Chat</string>
 
     <string-array name="importance_levels">
         <item>1 - Very Low</item>
