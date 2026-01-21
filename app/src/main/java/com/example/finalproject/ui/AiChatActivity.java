@@ -56,7 +56,7 @@ public class AiChatActivity extends AppCompatActivity {
         rvChat.setLayoutManager(new LinearLayoutManager(this));
         rvChat.setAdapter(chatAdapter);
 
-        // Pesan Sapaan
+        //opening message
         addBotMessage("Hello! Paste your task here, i will create you a reminder automatically.");
 
         btnSend.setOnClickListener(v -> {
@@ -68,25 +68,25 @@ public class AiChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage(String userText) {
-        // 1. Tampilkan Chat User
+        //show user chat
         chatList.add(new ChatMessage(userText, true));
         chatAdapter.notifyItemInserted(chatList.size() - 1);
         rvChat.scrollToPosition(chatList.size() - 1);
         etInput.setText("");
 
-        // Ambil waktu sekarang di HP user
+        //take time  sekarang di HP user
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault());
         String currentDateTime = sdf.format(new Date());
 
-        // 2. Siapkan Prompt Rahasia (Update Prompt)
-        // Kita "selundupkan" info tanggal hari ini ke prompt
+        //prepare secret prompt
+        //enter today date to prompt
         String prompt = "Context: Current Date and Time is " + currentDateTime + ". " +
                 "Extract info from this text: '" + userText + "'. " +
                 "Return ONLY a JSON with fields: " +
                 "title (string), description (string), deadline (string format 'yyyy-MM-dd HH:mm', calculate based on context), " +
                 "importance (int 1-5), category (string). No markdown.";
 
-        // 3. Panggil API
+        //call api
         apiService.chatWithGemini(GeminiApiService.API_KEY, new GeminiRequest(prompt))
                 .enqueue(new Callback<GeminiResponse>() {
                     @Override
@@ -114,17 +114,16 @@ public class AiChatActivity extends AppCompatActivity {
 
     private void processAIResponse(String jsonText) {
         try {
-            // 1. Bersihin Markdown (biar JSON bersih)
+            //clean markdown (cleaning JSON)
             jsonText = jsonText.replace("```json", "").replace("```", "").trim();
 
-            // 2. Convert JSON ke Object Java
+            //convert JSON to Object Java
             Gson gson = new Gson();
             TaskDraft draft = gson.fromJson(jsonText, TaskDraft.class);
 
-            // 3. LOGIC BARU: Parsing Tanggal dari String ke Long
+            //new logic : Parsing date from string to long
             long finalDeadline = 0;
             try {
-                // Format ini harus SAMA PERSIS dengan request prompt kita ('yyyy-MM-dd HH:mm')
                 java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm", java.util.Locale.getDefault());
                 if (draft.deadline != null && !draft.deadline.isEmpty()) {
                     java.util.Date date = sdf.parse(draft.deadline);
@@ -133,15 +132,15 @@ public class AiChatActivity extends AppCompatActivity {
                     }
                 }
             } catch (Exception e) {
-                // Kalau AI gagal kasih format yg bener, default ke 24 jam dari sekarang
+                //if AI failed to return the right format, default to 24 hours from now
                 finalDeadline = System.currentTimeMillis() + 86400000;
             }
 
-            // 4. Simpan ke Database
+            //save to database
             Task newTask = Task.createNewTask(
                     draft.title != null ? draft.title : "Task without title",
                     draft.description,
-                    finalDeadline, // Pake deadline hasil parsing
+                    finalDeadline, //use deadline from parsing
                     draft.importance,
                     draft.category != null ? draft.category : "General"
             );

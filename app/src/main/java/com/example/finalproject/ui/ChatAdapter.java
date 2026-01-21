@@ -30,18 +30,27 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
     @Override
     public void onBindViewHolder(@NonNull ChatViewHolder holder, int position) {
         ChatMessage chat = chatList.get(position);
-        holder.tvMessage.setText(chat.message);
+        holder.tvMessage.setText(chat.getMessage());
 
-        // Logic Layout: User Kanan (Biru), Bot Kiri (Putih/Abu)
-        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) holder.tvMessage.getLayoutParams();
-        if (chat.isUser) {
-            params.gravity = Gravity.END;
-            holder.tvMessage.setBackgroundColor(Color.parseColor("#BBDEFB")); // Biru Muda
+        if (chat.isUser()) {
+            //position: right
+            holder.chatLayout.setGravity(Gravity.END);
+
+            //use bubble user
+            holder.tvMessage.setBackgroundResource(R.drawable.bg_bubble_user);
+
+            //text color: white
+            holder.tvMessage.setTextColor(Color.WHITE);
         } else {
-            params.gravity = Gravity.START;
-            holder.tvMessage.setBackgroundColor(Color.WHITE);
+            //position: left
+            holder.chatLayout.setGravity(Gravity.START);
+
+            //use bubble ai
+            holder.tvMessage.setBackgroundResource(R.drawable.bg_bubble_ai);
+
+            //text color: black
+            holder.tvMessage.setTextColor(Color.BLACK);
         }
-        holder.tvMessage.setLayoutParams(params);
     }
 
     @Override
@@ -49,9 +58,13 @@ public class ChatAdapter extends RecyclerView.Adapter<ChatAdapter.ChatViewHolder
 
     static class ChatViewHolder extends RecyclerView.ViewHolder {
         TextView tvMessage;
+        LinearLayout chatLayout;
+
         public ChatViewHolder(@NonNull View itemView) {
             super(itemView);
             tvMessage = itemView.findViewById(R.id.tvMessage);
+
+            chatLayout = itemView.findViewById(R.id.chatLayout);
         }
     }
 }

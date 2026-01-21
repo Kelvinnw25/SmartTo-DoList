@@ -12,7 +12,7 @@ import okhttp3.logging.HttpLoggingInterceptor;
 
 public interface GeminiApiService {
 
-    // Ambil API Key dari tempat rahasia (BuildConfig)
+    //take api key from BuildConfig
     String API_KEY = BuildConfig.API_KEY;
     String BASE_URL = "https://generativelanguage.googleapis.com/";
 
@@ -23,20 +23,20 @@ public interface GeminiApiService {
     );
 
     static GeminiApiService create() {
-        // 1. Bikin Logger
+        //create logger
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
 
-        // 2. Masukin ke Client
+        //enter to client
         OkHttpClient client = new OkHttpClient.Builder()
                 .addInterceptor(logging)
                 .build();
 
-        // 3. Pasang di Retrofit
+        //add to retrofit
         return new Retrofit.Builder()
                 .baseUrl(BASE_URL)
                 .addConverterFactory(GsonConverterFactory.create())
-                .client(client) // <--- PENTING: Attach client di sini
+                .client(client)
                 .build()
                 .create(GeminiApiService.class);
     }
